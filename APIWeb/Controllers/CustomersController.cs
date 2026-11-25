@@ -20,14 +20,14 @@ public class CustomersController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var result = await _customerService.GetAllAsync();
+        var result = await _customerService.ObtenerTodosAsync();
         return Ok(result.Data);
     }
 
     [HttpGet("{customerId}")]
     public async Task<IActionResult> GetById(string customerId)
     {
-        var result = await _customerService.GetByIdAsync(customerId);
+        var result = await _customerService.ObtenerPorIdAsync(customerId);
         if (!result.Success)
             return StatusCode(result.StatusCode, new { success = false, message = result.Message, errors = Array.Empty<string>() });
 
@@ -37,7 +37,7 @@ public class CustomersController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateCustomerRequestDto request)
     {
-        var result = await _customerService.CreateAsync(request);
+        var result = await _customerService.CrearAsync(request);
         if (!result.Success)
             return StatusCode(result.StatusCode, new { success = false, message = result.Message, errors = Array.Empty<string>() });
 
@@ -47,7 +47,7 @@ public class CustomersController : ControllerBase
     [HttpPut("{customerId}")]
     public async Task<IActionResult> Update(string customerId, [FromBody] UpdateCustomerRequestDto request)
     {
-        var result = await _customerService.UpdateAsync(customerId, request);
+        var result = await _customerService.EditarAsync(customerId, request);
         if (!result.Success)
             return StatusCode(result.StatusCode, new { success = false, message = result.Message, errors = Array.Empty<string>() });
 

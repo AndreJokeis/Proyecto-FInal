@@ -15,7 +15,7 @@ public class CustomerService : ICustomerService
         _context = context;
     }
 
-    public async Task<ServiceResult<List<CustomerResponseDto>>> GetAllAsync()
+    public async Task<ServiceResult<List<CustomerResponseDto>>> ObtenerTodosAsync()
     {
         var customers = await _context.Customers
             .AsNoTracking()
@@ -27,7 +27,7 @@ public class CustomerService : ICustomerService
         return ServiceResult<List<CustomerResponseDto>>.Ok(customers);
     }
 
-    public async Task<ServiceResult<CustomerResponseDto>> GetByIdAsync(string customerId)
+    public async Task<ServiceResult<CustomerResponseDto>> ObtenerPorIdAsync(string customerId)
     {
         var id = customerId.Trim().ToUpperInvariant();
         var customer = await _context.Customers
@@ -40,7 +40,7 @@ public class CustomerService : ICustomerService
         return ServiceResult<CustomerResponseDto>.Ok(ToDto(customer));
     }
 
-    public async Task<ServiceResult<CustomerResponseDto>> CreateAsync(CreateCustomerRequestDto request)
+    public async Task<ServiceResult<CustomerResponseDto>> CrearAsync(CreateCustomerRequestDto request)
     {
         var id = request.CustomerId.Trim().ToUpperInvariant();
 
@@ -69,7 +69,7 @@ public class CustomerService : ICustomerService
         return ServiceResult<CustomerResponseDto>.Ok(ToDto(customer), 201, "Cliente creado correctamente.");
     }
 
-    public async Task<ServiceResult<CustomerResponseDto>> UpdateAsync(string customerId, UpdateCustomerRequestDto request)
+    public async Task<ServiceResult<CustomerResponseDto>> EditarAsync(string customerId, UpdateCustomerRequestDto request)
     {
         var id = customerId.Trim().ToUpperInvariant();
         var customer = await _context.Customers
@@ -102,7 +102,6 @@ public class CustomerService : ICustomerService
         if (customer is null)
             return ServiceResult<bool>.Fail(404, "Cliente no encontrado.");
 
-        // Eliminación lógica obligatoria: nunca usar Remove()
         customer.IsDeleted = true;
         await _context.SaveChangesAsync();
 
