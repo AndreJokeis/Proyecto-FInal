@@ -45,6 +45,7 @@ Sistema web de Punto de Venta (POS) con arquitectura desacoplada (Backend REST +
 - **2026-11-25**: Se acuerda la división modular del Backend para trabajar en paralelo sin conflictos: Richy toma Infraestructura/Seguridad, Auth y Clientes (eliminación lógica); Joseph toma Alta de Empleados, Catálogo de Productos y registro de Ventas (POS), separando los registros de inyección de dependencias en `Program.cs`.
 - **2026-11-25**: Se implementan y prueban con Postman `POST /api/auth/register` y `POST /api/auth/login` (`AuthService`, `AuthController` y `ServiceResult`), validando registro vinculado a `customers`, prevención de duplicados (`409`), emisión de JWT con roles, cabeceras anti-Clickjacking y bloqueo de 15 minutos tras 3 intentos fallidos (`423`).
 - **2026-11-25**: Se implementa y prueba en Postman el CRUD de clientes (`CustomersController` y `CustomerService`) con eliminación lógica (`IsDeleted`), prevención de duplicados (`409`) y control de acceso por roles (`401`/`403` para usuarios no autorizados).
+- **2026-11-25**: Se implementa y prueba en Postman el historial de ventas filtrado por rol (`GET /api/orders` y `GET /api/orders/{orderId}` en `OrdersController` y `OrderService`), validando que un `Customer` solo consulte sus propias órdenes mediante el `CustomerId` del JWT y reciba `403` al intentar ver órdenes ajenas.
 
 ## Hoja de Ruta y Sprints (Backlog Vivo)
 
@@ -69,7 +70,7 @@ Sistema web de Punto de Venta (POS) con arquitectura desacoplada (Backend REST +
 
 ### Sprint 3: Módulo de Punto de Venta (Registro de Ventas)
 - [ ] Implementar registro transaccional de ventas (`POST /api/orders`) insertando en `orders` y `order details`, tomando `UnitPrice` exclusivamente desde BD, bloqueando productos descontinuados, validando stock y descontando inventario. *(Joseph)*
-- [ ] Implementar consulta de historial de ventas filtrada por rol (el cliente solo ve sus propias órdenes; `Employee`/`Admin` consultan ventas operativas). *(Richy)*
+- [x] Implementar consulta de historial de ventas filtrada por rol (el cliente solo ve sus propias órdenes; `Employee`/`Admin` consultan ventas operativas). *(Richy)*
 - [ ] Construir interfaz de Punto de Venta / Carrito y vista de Historial de Ventas con feedback claro al usuario. *(Jesús)*
 - [ ] Pruebas de seguridad de negocio: intento de manipular precio desde payload, compra de producto descontinuado, stock insuficiente y duplicado de productos en orden. *(Richy)*
 

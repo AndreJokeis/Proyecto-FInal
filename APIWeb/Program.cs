@@ -43,6 +43,7 @@ builder.Services.AddAuthorization();
 // --- Servicios Auth y Clientes (Richy) ---
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 
 // --- Servicios Empleados, Productos y Ventas (Joseph) ---
 // builder.Services.AddScoped<IProductService, ProductService>();
