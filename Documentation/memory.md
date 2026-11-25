@@ -43,6 +43,7 @@ Sistema web de Punto de Venta (POS) con arquitectura desacoplada (Backend REST +
 - **2026-11-25**: Se elimina `WeatherForecast` para cumplir con la política de mínima exposición de la API.
 - **2026-11-25**: Se configura la base de seguridad en `Program.cs` y `appsettings.json`: autenticación JWT con roles, `GlobalExceptionMiddleware` para manejo limpio de errores y cabeceras HTTP anti-Clickjacking (`X-Frame-Options` y `Content-Security-Policy`).
 - **2026-11-25**: Se acuerda la división modular del Backend para trabajar en paralelo sin conflictos: Richy toma Infraestructura/Seguridad, Auth y Clientes (eliminación lógica); Joseph toma Alta de Empleados, Catálogo de Productos y registro de Ventas (POS), separando los registros de inyección de dependencias en `Program.cs`.
+- **2026-11-25**: Se implementan y prueban con Postman `POST /api/auth/register` y `POST /api/auth/login` (`AuthService`, `AuthController` y `ServiceResult`), validando registro vinculado a `customers`, prevención de duplicados (`409`), emisión de JWT con roles, cabeceras anti-Clickjacking y bloqueo de 15 minutos tras 3 intentos fallidos (`423`).
 
 ## Hoja de Ruta y Sprints (Backlog Vivo)
 
@@ -53,8 +54,8 @@ Sistema web de Punto de Venta (POS) con arquitectura desacoplada (Backend REST +
 - [ ] Crear estructura base del Frontend (HTML5, Bootstrap 5, módulo `apiClient.js`, layout compartido y manejo de alertas/toasts). *(Jesús / Luis)*
 
 ### Sprint 1: Autenticación, Roles, Lockout/Captcha y Protección de Rutas
-- [ ] Implementar registro autónomo de clientes (`POST /api/auth/register`) vinculando cuenta en `users` y registro en `customers` sin duplicados. *(Richy)*
-- [ ] Implementar inicio de sesión (`POST /api/auth/login`) con JWT, hash seguro de contraseñas, Captcha y/o bloqueo tras 3 intentos fallidos. *(Richy)*
+- [x] Implementar registro autónomo de clientes (`POST /api/auth/register`) vinculando cuenta en `users` y registro en `customers` sin duplicados. *(Richy)*
+- [x] Implementar inicio de sesión (`POST /api/auth/login`) con JWT, hash seguro de contraseñas, Captcha y/o bloqueo tras 3 intentos fallidos. *(Richy)*
 - [ ] Implementar alta exclusiva de empleados/administradores por `Admin` (`POST /api/admin/employees`) registrando en `users` y `employees`. *(Joseph)*
 - [ ] Construir pantallas de Login, Registro de Cliente y Panel de Alta de Empleados + guardas de acceso por URL según rol (`authGuard.js`). *(Luis)*
 - [ ] Verificar con pruebas de QA: bloqueo al 3.er intento fallido, acceso denegado (`401`/`403`) en API y redirección por URL. *(Richy)*
