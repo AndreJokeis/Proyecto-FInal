@@ -70,7 +70,7 @@ app.Use(async (context, next) =>
 ```
 - **Sanitización de entradas**: Recortar espacios (`Trim()`), validar formatos estrictos y sanitizar cualquier texto libre antes de persistir para prevenir XSS almacenado.
 
-## 5. Patrón de Reglas de Negocio y Persistencia (EF Core + MySQL Northwind)
+## 5. Patrón de Reglas de Negocio y Persistencia (EF Core + `MySql.EntityFrameworkCore` + MySQL Northwind)
 - **Registro de Ventas Transaccional**:
   - Envolver el alta de `orders`, `order details` y actualización de `products.UnitsInStock` dentro de `await using var tx = await _context.Database.BeginTransactionAsync();`.
   - Consultar cada producto en BD por `ProductId`: verificar existencia, `!product.Discontinued` y `product.UnitsInStock >= item.Quantity`.

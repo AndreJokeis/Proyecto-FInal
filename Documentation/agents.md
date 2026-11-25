@@ -8,8 +8,8 @@
 - **Luis**: Frontend Developer (HTML5, Bootstrap 5, JavaScript modular, vistas de autenticación, protección de rutas por URL, módulos administrativos y UX).
 
 ## Stack Tecnológico Inmutable
-- **Backend**: ASP.NET Core Web API (.NET 8 LTS, C#).
-- **Acceso a Datos (ORM)**: Entity Framework Core con proveedor `Pomelo.EntityFrameworkCore.MySql`.
+- **Backend**: ASP.NET Core Web API (.NET 10, C#).
+- **Acceso a Datos (ORM)**: Entity Framework Core con proveedor `MySql.EntityFrameworkCore`.
 - **Base de Datos**: MySQL 8.x sobre esquema `nwind` (Northwind + extensiones controladas de seguridad y eliminación lógica).
 - **Arquitectura Backend**: Arquitectura por Capas (`Controllers` → `Services` → `Repositories / DbContext` + `DTOs`) con Inyección de Dependencias nativa de ASP.NET Core.
 - **Autenticación y Seguridad**: JWT (JSON Web Tokens), hashing seguro de contraseñas (`PasswordHasher` / `BCrypt`), autorización basada en roles (RBAC: `Admin`, `Employee`, `Customer`), bloqueo tras 3 intentos fallidos y/o Captcha.

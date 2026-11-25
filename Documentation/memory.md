@@ -32,13 +32,21 @@ Sistema web de Punto de Venta (POS) con arquitectura desacoplada (Backend REST +
 - **2026-11-22**: Se acuerda mantener la documentación viva de gobierno técnico (`agents.md`, `memory.md` y `skills.md`) dentro de `Documentation/` junto a `EXPECTS.md` y `nwind_completa.sql`.
 - **2026-11-22**: Flujo de versionamiento Git: rama `main` estable y rama `develop` de integración; cada tarea se desarrolla en ramas `feature/`, `fix/` o `chore/` integradas vía Pull Request.
 - **2026-11-22**: Se establece la política de inmutabilidad de `memory.md` para conservar trazabilidad completa de decisiones y avances entre los 4 integrantes.
+- **2026-11-22**: Se actualiza el stack técnico para utilizar ASP.NET Core Web API sobre **.NET 10** y Entity Framework Core con el proveedor **`MySql.EntityFrameworkCore`**, en concordancia con el proyecto base actual.
+- **2026-11-22**: Se retira la integración con Google OAuth. La autenticación se implementará posteriormente con cuentas propias, contraseñas hasheadas, roles y JWT.
+- **2026-11-22**: Se crea la base de trabajo `nwind_pos` como copia de `nwind`, conservando `nwind` como referencia original sin modificaciones.
+- **2026-11-22**: Se amplía `nwind_pos` con los campos de autenticación en `usuarios` (`Rol`, `FailedLoginAttempts`, `LockoutEnd`, `IsActive`, `CustomerID` y `EmployeeID`) y con `IsDeleted` en `customers`.
+- **2026-11-22**: Se ajustan las relaciones históricas de `nwind_pos` para evitar el borrado en cascada de clientes con órdenes y de productos con detalles de órdenes.
+- **2026-11-22**: Se sincronizan los modelos de Entity Framework con `nwind_pos`, creando `Usuario`, `UserRole`, las relaciones de cuenta y la propiedad `Customer.IsDeleted`. La API utiliza `nwind_pos` mediante `appsettings.json`.
+- **2026-11-22**: Para esta tarea puntual, el usuario implementó personalmente los DTOs de autenticación con acompañamiento del Asistente IA; esta decisión no constituye una regla general para el equipo ni para futuras tareas.
+- **2026-11-22**: Se crean y validan `RegisterRequestDto`, `LoginRequestDto` y `AuthResponseDto` en `APIWeb/DTOs/Auth`. Se corrigió una llave adicional en `RegisterRequestDto` y la solución compiló correctamente.
 
 ## Hoja de Ruta y Sprints (Backlog Vivo)
 
 ### Sprint 0: Base del Proyecto, Esquema MySQL y Arquitectura Inicial
 - [ ] Crear rama `develop` y estructura base de carpetas (`Backend/`, `Frontend/`, `Database/`).
 - [ ] Diseñar y versionar script incremental SQL sobre `nwind` para tabla `users` (roles + intentos fallidos/lockout) y campo de eliminación lógica en `customers`. *(Joseph / Richy)*
-- [ ] Inicializar solución ASP.NET Core Web API (.NET 8) con EF Core (`Pomelo.EntityFrameworkCore.MySql`), configuración de CORS, Swagger (solo en desarrollo) y middleware global de excepciones + cabeceras anti-clickjacking. *(Joseph)*
+- [ ] Inicializar solución ASP.NET Core Web API (.NET 10) con EF Core (`MySql.EntityFrameworkCore`), configuración de CORS, Swagger (solo en desarrollo) y middleware global de excepciones + cabeceras anti-clickjacking. *(Joseph)*
 - [ ] Crear estructura base del Frontend (HTML5, Bootstrap 5, módulo `apiClient.js`, layout compartido y manejo de alertas/toasts). *(Jesús / Luis)*
 
 ### Sprint 1: Autenticación, Roles, Lockout/Captcha y Protección de Rutas
