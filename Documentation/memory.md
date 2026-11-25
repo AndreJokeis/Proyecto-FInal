@@ -40,13 +40,16 @@ Sistema web de Punto de Venta (POS) con arquitectura desacoplada (Backend REST +
 - **2026-11-22**: Se sincronizan los modelos de Entity Framework con `nwind_pos`, creando `Usuario`, `UserRole`, las relaciones de cuenta y la propiedad `Customer.IsDeleted`. La API utiliza `nwind_pos` mediante `appsettings.json`.
 - **2026-11-22**: Para esta tarea puntual, el usuario implementó personalmente los DTOs de autenticación con acompañamiento del Asistente IA; esta decisión no constituye una regla general para el equipo ni para futuras tareas.
 - **2026-11-22**: Se crean y validan `RegisterRequestDto`, `LoginRequestDto` y `AuthResponseDto` en `APIWeb/DTOs/Auth`. Se corrigió una llave adicional en `RegisterRequestDto` y la solución compiló correctamente.
+- **2026-11-25**: Se elimina `WeatherForecast` para cumplir con la política de mínima exposición de la API.
+- **2026-11-25**: Se configura la base de seguridad en `Program.cs` y `appsettings.json`: autenticación JWT con roles, `GlobalExceptionMiddleware` para manejo limpio de errores y cabeceras HTTP anti-Clickjacking (`X-Frame-Options` y `Content-Security-Policy`).
+- **2026-11-25**: Se acuerda la división modular del Backend para trabajar en paralelo sin conflictos: Richy toma Infraestructura/Seguridad, Auth y Clientes (eliminación lógica); Joseph toma Alta de Empleados, Catálogo de Productos y registro de Ventas (POS), separando los registros de inyección de dependencias en `Program.cs`.
 
 ## Hoja de Ruta y Sprints (Backlog Vivo)
 
 ### Sprint 0: Base del Proyecto, Esquema MySQL y Arquitectura Inicial
-- [ ] Crear rama `develop` y estructura base de carpetas (`Backend/`, `Frontend/`, `Database/`).
-- [ ] Diseñar y versionar script incremental SQL sobre `nwind` para tabla `users` (roles + intentos fallidos/lockout) y campo de eliminación lógica en `customers`. *(Joseph / Richy)*
-- [ ] Inicializar solución ASP.NET Core Web API (.NET 10) con EF Core (`MySql.EntityFrameworkCore`), configuración de CORS, Swagger (solo en desarrollo) y middleware global de excepciones + cabeceras anti-clickjacking. *(Joseph)*
+- [x] Crear rama `develop` y estructura base de carpetas (`Backend/`, `Frontend/`, `Database/`).
+- [x] Diseñar y versionar script incremental SQL sobre `nwind` para tabla `users` (roles + intentos fallidos/lockout) y campo de eliminación lógica en `customers`. *(Joseph / Richy)*
+- [x] Inicializar solución ASP.NET Core Web API (.NET 10) con EF Core (`MySql.EntityFrameworkCore`), configuración de CORS, Swagger (solo en desarrollo) y middleware global de excepciones + cabeceras anti-clickjacking. *(Joseph)*
 - [ ] Crear estructura base del Frontend (HTML5, Bootstrap 5, módulo `apiClient.js`, layout compartido y manejo de alertas/toasts). *(Jesús / Luis)*
 
 ### Sprint 1: Autenticación, Roles, Lockout/Captcha y Protección de Rutas
