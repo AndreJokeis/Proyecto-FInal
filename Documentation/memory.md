@@ -44,6 +44,7 @@ Sistema web de Punto de Venta (POS) con arquitectura desacoplada (Backend REST +
 - **2026-11-25**: Se configura la base de seguridad en `Program.cs` y `appsettings.json`: autenticación JWT con roles, `GlobalExceptionMiddleware` para manejo limpio de errores y cabeceras HTTP anti-Clickjacking (`X-Frame-Options` y `Content-Security-Policy`).
 - **2026-11-25**: Se acuerda la división modular del Backend para trabajar en paralelo sin conflictos: Richy toma Infraestructura/Seguridad, Auth y Clientes (eliminación lógica); Joseph toma Alta de Empleados, Catálogo de Productos y registro de Ventas (POS), separando los registros de inyección de dependencias en `Program.cs`.
 - **2026-11-25**: Se implementan y prueban con Postman `POST /api/auth/register` y `POST /api/auth/login` (`AuthService`, `AuthController` y `ServiceResult`), validando registro vinculado a `customers`, prevención de duplicados (`409`), emisión de JWT con roles, cabeceras anti-Clickjacking y bloqueo de 15 minutos tras 3 intentos fallidos (`423`).
+- **2026-11-25**: Se implementa y prueba en Postman el CRUD de clientes (`CustomersController` y `CustomerService`) con eliminación lógica (`IsDeleted`), prevención de duplicados (`409`) y control de acceso por roles (`401`/`403` para usuarios no autorizados).
 
 ## Hoja de Ruta y Sprints (Backlog Vivo)
 
@@ -62,7 +63,7 @@ Sistema web de Punto de Venta (POS) con arquitectura desacoplada (Backend REST +
 
 ### Sprint 2: Catálogo de Productos y Gestión de Clientes (Eliminación Lógica)
 - [ ] Implementar endpoints CRUD de productos con DTOs mínimos, validaciones de negocio y manejo de estado `Discontinued`. *(Joseph)*
-- [ ] Implementar endpoints CRUD de clientes con eliminación lógica (`IsDeleted`), evitando borrado físico y duplicados. *(Richy)*
+- [x] Implementar endpoints CRUD de clientes con eliminación lógica (`IsDeleted`), evitando borrado físico y duplicados. *(Richy)*
 - [ ] Construir vistas de Catálogo de Productos y Gestión de Clientes en Bootstrap 5 con validaciones visuales y protección anti-XSS (`textContent`). *(Jesús / Luis)*
 - [ ] Pruebas de integración de CRUD, sanitización de inputs y mensajes de error adecuados. *(Richy)*
 
