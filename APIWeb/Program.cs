@@ -42,6 +42,7 @@ builder.Services.AddAuthorization();
 // 3. Inyección de Dependencias (bloques separados para evitar conflictos en Git)
 // --- Servicios Auth y Clientes (Richy) ---
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
 
 // --- Servicios Empleados, Productos y Ventas (Joseph) ---
 // builder.Services.AddScoped<IProductService, ProductService>();
