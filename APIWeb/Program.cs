@@ -4,6 +4,8 @@ using APIWeb.Middleware;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using APIWeb.Services;
+using APIWeb.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,7 +41,7 @@ builder.Services.AddAuthorization();
 
 // 3. Inyección de Dependencias (bloques separados para evitar conflictos en Git)
 // --- Servicios Auth y Clientes (Richy) ---
-// builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 // --- Servicios Empleados, Productos y Ventas (Joseph) ---
 // builder.Services.AddScoped<IProductService, ProductService>();
