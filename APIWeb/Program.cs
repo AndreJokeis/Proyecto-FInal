@@ -46,7 +46,8 @@ builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 
 // --- Servicios Empleados, Productos y Ventas (Joseph) ---
-// builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+builder.Services.AddScoped<IProductService, ProductService>();
 
 // 4. Controladores, OpenAPI/Swagger y CORS
 builder.Services.AddControllers();

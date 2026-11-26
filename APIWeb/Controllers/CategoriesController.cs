@@ -1,26 +1,25 @@
-using APIWeb.Data;
-using APIWeb.Models;
+using APIWeb.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
-namespace APIWeb.Controllers
+namespace APIWeb.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+[Authorize(Roles = "Admin,Employee,Customer")]
+public class CategoriesController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class CategoriesController : ControllerBase
+    private readonly IProductService _productService;
+
+    public CategoriesController(IProductService productService)
     {
-        private readonly ContextoBD _context;
+        _productService = productService;
+    }
 
-        public CategoriesController(ContextoBD context)
-        {
-            _context = context;
-        }
-
-        // GET: api/Categories
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Category>>> GetCategories()
-        {
-            return await _context.Categories.ToListAsync();
-        }
+    [HttpGet]
+    public async Task<IActionResult> GetCategories()
+    {
+        var result = await _productService.ObtenerCategoriasAsync();
+        return Ok(result.Data);
     }
 }

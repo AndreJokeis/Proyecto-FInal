@@ -1,26 +1,25 @@
-using APIWeb.Data;
-using APIWeb.Models;
+using APIWeb.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
-namespace APIWeb.Controllers
+namespace APIWeb.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+[Authorize(Roles = "Admin,Employee")]
+public class SuppliersController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class SuppliersController : ControllerBase
+    private readonly IProductService _productService;
+
+    public SuppliersController(IProductService productService)
     {
-        private readonly ContextoBD _context;
+        _productService = productService;
+    }
 
-        public SuppliersController(ContextoBD context)
-        {
-            _context = context;
-        }
-
-        // GET: api/Suppliers
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Supplier>>> GetSuppliers()
-        {
-            return await _context.Suppliers.ToListAsync();
-        }
+    [HttpGet]
+    public async Task<IActionResult> GetSuppliers()
+    {
+        var result = await _productService.ObtenerProveedoresAsync();
+        return Ok(result.Data);
     }
 }

@@ -48,6 +48,7 @@ Sistema web de Punto de Venta (POS) con arquitectura desacoplada (Backend REST +
 - **2026-11-25**: Se implementa y prueba en Postman el historial de ventas filtrado por rol (`GET /api/orders` y `GET /api/orders/{orderId}` en `OrdersController` y `OrderService`), validando que un `Customer` solo consulte sus propias órdenes mediante el `CustomerId` del JWT y reciba `403` al intentar ver órdenes ajenas.
 - **2026-11-25**: Se implementa la arquitectura base modular del Frontend en `APIWeb/wwwroot/` (`js/services/apiClient.js`, `js/services/session.js`, `js/guards/authGuard.js`, `js/utils/ui.js`, `js/components/navbar.js`), junto con `login.html`, `register.html`, `acceso-denegado.html`, `index.html` y `empleados.html` (protegida solo para `Admin` y lista para validar contrato con `POST /api/admin/employees`). *(Luis)*
 - **2026-11-25**: Se implementa el módulo completo de Gestión de Clientes (`clientes.html` y `js/pages/clientes.js`) conectado a `CustomersController` con buscador, validaciones visuales de Bootstrap 5, baja lógica mediante modal de confirmación y renderizado seguro ansti-XSS con `textContent`. *(Luis)*
+- **2026-11-26**: Se implementa en rama `feature/employees-products-pos` el alta exclusiva de empleados/administradores (`POST /api/admin/employees` con `AdminEmployeesController` y `EmployeeService`), el CRUD refactorizado de productos (`ProductsController`, `ProductService` y DTOs con baja lógica mediante `Discontinued = true`), el registro transaccional de ventas POS (`POST /api/orders` en `OrdersController`/`OrderService` con precios desde MySQL, validación de stock/descontinuados y prevención de duplicados), y la auditoría con DTOs/autorización de `CategoriesController` y `SuppliersController`. *(Joseph)*
 
 ## Hoja de Ruta y Sprints (Backlog Vivo)
 
@@ -60,18 +61,18 @@ Sistema web de Punto de Venta (POS) con arquitectura desacoplada (Backend REST +
 ### Sprint 1: Autenticación, Roles, Lockout/Captcha y Protección de Rutas
 - [x] Implementar registro autónomo de clientes (`POST /api/auth/register`) vinculando cuenta en `users` y registro en `customers` sin duplicados. *(Richy)*
 - [x] Implementar inicio de sesión (`POST /api/auth/login`) con JWT, hash seguro de contraseñas, Captcha y/o bloqueo tras 3 intentos fallidos. *(Richy)*
-- [ ] Implementar alta exclusiva de empleados/administradores por `Admin` (`POST /api/admin/employees`) registrando en `users` y `employees`. *(Joseph)*
+- [x] Implementar alta exclusiva de empleados/administradores por `Admin` (`POST /api/admin/employees`) registrando en `users` y `employees`. *(Joseph)*
 - [x] Construir pantallas de Login, Registro de Cliente y Panel de Alta de Empleados + guardas de acceso por URL según rol (`authGuard.js`). *(Luis)*
 - [ ] Verificar con pruebas de QA: bloqueo al 3.er intento fallido, acceso denegado (`401`/`403`) en API y redirección por URL. *(Richy)*
 
 ### Sprint 2: Catálogo de Productos y Gestión de Clientes (Eliminación Lógica)
-- [ ] Implementar endpoints CRUD de productos con DTOs mínimos, validaciones de negocio y manejo de estado `Discontinued`. *(Joseph)*
+- [x] Implementar endpoints CRUD de productos con DTOs mínimos, validaciones de negocio y manejo de estado `Discontinued`. *(Joseph)*
 - [x] Implementar endpoints CRUD de clientes con eliminación lógica (`IsDeleted`), evitando borrado físico y duplicados. *(Richy)*
 - [ ] Construir vistas de Catálogo de Productos y Gestión de Clientes en Bootstrap 5 con validaciones visuales y protección anti-XSS (`textContent`). *(Jesús / Luis)*
 - [ ] Pruebas de integración de CRUD, sanitización de inputs y mensajes de error adecuados. *(Richy)*
 
 ### Sprint 3: Módulo de Punto de Venta (Registro de Ventas)
-- [ ] Implementar registro transaccional de ventas (`POST /api/orders`) insertando en `orders` y `order details`, tomando `UnitPrice` exclusivamente desde BD, bloqueando productos descontinuados, validando stock y descontando inventario. *(Joseph)*
+- [x] Implementar registro transaccional de ventas (`POST /api/orders`) insertando en `orders` y `order details`, tomando `UnitPrice` exclusivamente desde BD, bloqueando productos descontinuados, validando stock y descontando inventario. *(Joseph)*
 - [x] Implementar consulta de historial de ventas filtrada por rol (el cliente solo ve sus propias órdenes; `Employee`/`Admin` consultan ventas operativas). *(Richy)*
 - [ ] Construir interfaz de Punto de Venta / Carrito y vista de Historial de Ventas con feedback claro al usuario. *(Jesús)*
 - [ ] Pruebas de seguridad de negocio: intento de manipular precio desde payload, compra de producto descontinuado, stock insuficiente y duplicado de productos en orden. *(Richy)*
