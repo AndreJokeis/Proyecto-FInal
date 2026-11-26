@@ -46,6 +46,8 @@ Sistema web de Punto de Venta (POS) con arquitectura desacoplada (Backend REST +
 - **2026-11-25**: Se implementan y prueban con Postman `POST /api/auth/register` y `POST /api/auth/login` (`AuthService`, `AuthController` y `ServiceResult`), validando registro vinculado a `customers`, prevención de duplicados (`409`), emisión de JWT con roles, cabeceras anti-Clickjacking y bloqueo de 15 minutos tras 3 intentos fallidos (`423`).
 - **2026-11-25**: Se implementa y prueba en Postman el CRUD de clientes (`CustomersController` y `CustomerService`) con eliminación lógica (`IsDeleted`), prevención de duplicados (`409`) y control de acceso por roles (`401`/`403` para usuarios no autorizados).
 - **2026-11-25**: Se implementa y prueba en Postman el historial de ventas filtrado por rol (`GET /api/orders` y `GET /api/orders/{orderId}` en `OrdersController` y `OrderService`), validando que un `Customer` solo consulte sus propias órdenes mediante el `CustomerId` del JWT y reciba `403` al intentar ver órdenes ajenas.
+- **2026-11-25**: Se implementa la arquitectura base modular del Frontend en `APIWeb/wwwroot/` (`js/services/apiClient.js`, `js/services/session.js`, `js/guards/authGuard.js`, `js/utils/ui.js`, `js/components/navbar.js`), junto con `login.html`, `register.html`, `acceso-denegado.html`, `index.html` y `empleados.html` (protegida solo para `Admin` y lista para validar contrato con `POST /api/admin/employees`). *(Luis)*
+- **2026-11-25**: Se implementa el módulo completo de Gestión de Clientes (`clientes.html` y `js/pages/clientes.js`) conectado a `CustomersController` con buscador, validaciones visuales de Bootstrap 5, baja lógica mediante modal de confirmación y renderizado seguro ansti-XSS con `textContent`. *(Luis)*
 
 ## Hoja de Ruta y Sprints (Backlog Vivo)
 
@@ -53,13 +55,13 @@ Sistema web de Punto de Venta (POS) con arquitectura desacoplada (Backend REST +
 - [x] Crear rama `develop` y estructura base de carpetas (`Backend/`, `Frontend/`, `Database/`).
 - [x] Diseñar y versionar script incremental SQL sobre `nwind` para tabla `users` (roles + intentos fallidos/lockout) y campo de eliminación lógica en `customers`. *(Joseph / Richy)*
 - [x] Inicializar solución ASP.NET Core Web API (.NET 10) con EF Core (`MySql.EntityFrameworkCore`), configuración de CORS, Swagger (solo en desarrollo) y middleware global de excepciones + cabeceras anti-clickjacking. *(Joseph)*
-- [ ] Crear estructura base del Frontend (HTML5, Bootstrap 5, módulo `apiClient.js`, layout compartido y manejo de alertas/toasts). *(Jesús / Luis)*
+- [x] Crear estructura base del Frontend (HTML5, Bootstrap 5, módulo `apiClient.js`, layout compartido y manejo de alertas/toasts). *(Jesús / Luis)*
 
 ### Sprint 1: Autenticación, Roles, Lockout/Captcha y Protección de Rutas
 - [x] Implementar registro autónomo de clientes (`POST /api/auth/register`) vinculando cuenta en `users` y registro en `customers` sin duplicados. *(Richy)*
 - [x] Implementar inicio de sesión (`POST /api/auth/login`) con JWT, hash seguro de contraseñas, Captcha y/o bloqueo tras 3 intentos fallidos. *(Richy)*
 - [ ] Implementar alta exclusiva de empleados/administradores por `Admin` (`POST /api/admin/employees`) registrando en `users` y `employees`. *(Joseph)*
-- [ ] Construir pantallas de Login, Registro de Cliente y Panel de Alta de Empleados + guardas de acceso por URL según rol (`authGuard.js`). *(Luis)*
+- [x] Construir pantallas de Login, Registro de Cliente y Panel de Alta de Empleados + guardas de acceso por URL según rol (`authGuard.js`). *(Luis)*
 - [ ] Verificar con pruebas de QA: bloqueo al 3.er intento fallido, acceso denegado (`401`/`403`) en API y redirección por URL. *(Richy)*
 
 ### Sprint 2: Catálogo de Productos y Gestión de Clientes (Eliminación Lógica)
