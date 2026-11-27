@@ -1,103 +1,73 @@
-using APIWeb.Data;
-using APIWeb.Models;
+using System.Security.Claims;
+using APIWeb.DTOs.Products;
+using APIWeb.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
-namespace APIWeb.Controllers
+namespace APIWeb.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+[Authorize(Roles = "Admin,Employee,Customer")]
+public class ProductsController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class ProductsController : ControllerBase
+    private readonly IProductService _productService;
+
+    public ProductsController(IProductService productService)
     {
-        private readonly ContextoBD _context;
+        _productService = productService;
+    }
 
-        public ProductsController(ContextoBD context)
-        {
-            _context = context;
-        }
+    [HttpGet]
+    public async Task<IActionResult> GetAll([FromQuery] bool includeDiscontinued = false)
+    {
+        var role = User.FindFirstValue(ClaimTypes.Role) ?? string.Empty;
+        var showDiscontinued = includeDiscontinued && (role == "Admin" || role == "Employee");
 
-        // GET: api/Products
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
-        {
-            return await _context.Products.ToListAsync();
-        }
+        var result = await _productService.ObtenerTodosAsync(showDiscontinued);
+        return Ok(result.Data);
+    }
 
-        // GET: api/Products/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Product>> GetProduct(int id)
-        {
-            var product = await _context.Products.FindAsync(id);
+    [HttpGet("{id:int}")]
+    public async Task<IActionResult> GetById(int id)
+    {
+        var result = await _productService.ObtenerPorIdAsync(id);
+        if (!result.Success)
+            return StatusCode(result.StatusCode, new { success = false, message = result.Message, errors = Array.Empty<string>() });
 
-            if (product == null)
-            {
-                return NotFound();
-            }
+        return Ok(result.Data);
+    }
 
-            return product;
-        }
+    [HttpPost]
+    [Authorize(Roles = "Admin,Employee")]
+    public async Task<IActionResult> Create([FromBody] CreateProductRequestDto request)
+    {
+        var result = await _productService.CrearAsync(request);
+        if (!result.Success)
+            return StatusCode(result.StatusCode, new { success = false, message = result.Message, errors = Array.Empty<string>() });
 
-        // PUT: api/Products/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutProduct(int id, Product product)
-        {
-            if (id != product.ProductId)
-            {
-                return BadRequest();
-            }
+        return StatusCode(result.StatusCode, result.Data);
+    }
 
-            _context.Entry(product).State = EntityState.Modified;
+    [HttpPut("{id:int}")]
+    [Authorize(Roles = "Admin,Employee")]
+    public async Task<IActionResult> Update(int id, [FromBody] UpdateProductRequestDto request)
+    {
+        var result = await _productService.EditarAsync(id, request);
+        if (!result.Success)
+            return StatusCode(result.StatusCode, new { success = false, message = result.Message, errors = Array.Empty<string>() });
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ProductExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+        return Ok(result.Data);
+    }
 
-            return NoContent();
-        }
+    [HttpDelete("{id:int}")]
+    [Authorize(Roles = "Admin,Employee")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var result = await _productService.DescontinuarAsync(id);
+        if (!result.Success)
+            return StatusCode(result.StatusCode, new { success = false, message = result.Message, errors = Array.Empty<string>() });
 
-        // POST: api/Products
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Product>> PostProduct(Product product)
-        {
-            _context.Products.Add(product);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetProduct", new { id = product.ProductId }, product);
-        }
-
-        // DELETE: api/Products/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteProduct(int id)
-        {
-            var product = await _context.Products.FindAsync(id);
-            if (product == null)
-            {
-                return NotFound();
-            }
-
-            _context.Products.Remove(product);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool ProductExists(int id)
-        {
-            return _context.Products.Any(e => e.ProductId == id);
-        }
+        return Ok(new { success = true, message = result.Message });
     }
 }
