@@ -1,9 +1,15 @@
 <!DOCTYPE html>
+<!-- ==========================================================================
+     ARCHIVO: wwwroot/acceso-denegado.html
+     PROPÓSITO: Pantalla 403 Forbidden a la que authGuard.js o apiClient.js
+                redirigen cuando un usuario intenta entrar por URL o API a un
+                módulo para el que su rol no tiene permiso.
+     ========================================================================== -->
 <html lang="es">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Acceso Denegado - Northwind POS</title>
+    <title>Acceso Denegado - Fashion Roma</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="bg-light d-flex align-items-center justify-content-center min-vh-100">
@@ -18,8 +24,8 @@
                             Tu cuenta no tiene los permisos necesarios para abrir esta sección.
                         </p>
                         <div class="d-flex justify-content-center gap-2">
-                            <a href="index.html" class="btn btn-primary">Volver al inicio</a>
-                            <a href="login.html" class="btn btn-outline-secondary">Cambiar cuenta</a>
+                            <a href="index.html" class="btn btn-success">Volver al inicio</a>
+                            <a href="login.html?switch=1" class="btn btn-outline-secondary">Cambiar cuenta</a>
                         </div>
                     </div>
                 </div>

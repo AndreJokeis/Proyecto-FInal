@@ -1,3 +1,13 @@
+// ============================================================================
+// ARCHIVO: Controllers/ProductsController.cs
+// PROPÓSITO: Endpoints del Catálogo de Productos (/api/Products).
+//            AUTORIZACIÓN DIFERENCIADA POR OPERACIÓN:
+//            - GET (consultar catálogo): permitido para Admin, Employee y Customer.
+//              (Solo Admin y Employee pueden ver productos descontinuados).
+//            - POST, PUT y DELETE (crear, editar y descontinuar): restringido con
+//              [Authorize(Roles = "Admin,Employee")].
+// ============================================================================
+
 using System.Security.Claims;
 using APIWeb.DTOs.Products;
 using APIWeb.Services.Interfaces;
@@ -18,6 +28,7 @@ public class ProductsController : ControllerBase
         _productService = productService;
     }
 
+    // GET /api/Products -> Lista productos (en POS muestra solo activos; en Catálogo el staff ve también descontinuados)
     [HttpGet]
     public async Task<IActionResult> GetAll([FromQuery] bool includeDiscontinued = false)
     {
@@ -28,6 +39,7 @@ public class ProductsController : ControllerBase
         return Ok(result.Data);
     }
 
+    // GET /api/Products/{id} -> Obtiene un producto por su ID
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetById(int id)
     {
@@ -38,6 +50,7 @@ public class ProductsController : ControllerBase
         return Ok(result.Data);
     }
 
+    // POST /api/Products -> Crea un nuevo producto (solo Admin y Employee)
     [HttpPost]
     [Authorize(Roles = "Admin,Employee")]
     public async Task<IActionResult> Create([FromBody] CreateProductRequestDto request)
@@ -49,6 +62,7 @@ public class ProductsController : ControllerBase
         return StatusCode(result.StatusCode, result.Data);
     }
 
+    // PUT /api/Products/{id} -> Edita o reactiva un producto existente (solo Admin y Employee)
     [HttpPut("{id:int}")]
     [Authorize(Roles = "Admin,Employee")]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateProductRequestDto request)
@@ -60,6 +74,7 @@ public class ProductsController : ControllerBase
         return Ok(result.Data);
     }
 
+    // DELETE /api/Products/{id} -> Baja lógica del producto marcando Discontinued = true (solo Admin y Employee)
     [HttpDelete("{id:int}")]
     [Authorize(Roles = "Admin,Employee")]
     public async Task<IActionResult> Delete(int id)

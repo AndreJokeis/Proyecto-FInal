@@ -1,3 +1,10 @@
+// ============================================================================
+// ARCHIVO: DTOs/Products/ProductResponseDto.cs
+// PROPÓSITO: DTO de salida para el catálogo de productos (GET /api/Products).
+//            Incluye CategoryName y SupplierName ya resueltos desde el Backend
+//            y solo las columnas necesarias para el catálogo y el Punto de Venta.
+// ============================================================================
+
 namespace APIWeb.DTOs.Products;
 
 public class ProductResponseDto

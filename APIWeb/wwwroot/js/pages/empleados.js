@@ -1,8 +1,17 @@
-﻿import { requireRoles } from "../guards/authGuard.js";
-import { renderNavbar } from "../components/navbar.js";
+﻿// ============================================================================
+// ARCHIVO: empleados.js
+// PROPÓSITO: Alta exclusiva de Empleados y Administradores por un Admin.
+//            Envía POST /api/admin/employees -> crea registro en 'employees'
+//            y cuenta en 'usuarios' vinculada por EmployeeId.
+// ============================================================================
+
+import { requireRoles } from "../guards/authGuard.js";
+import { renderNavbar } from "../components/navbar.js?v=2";
 import { apiClient } from "../services/apiClient.js";
 import { clearInlineAlert, showInlineAlert, showToast } from "../utils/ui.js";
 
+// REVISIÓN DE ACCESO POR URL: Solo el rol "Admin" puede permanecer en empleados.html.
+// Si un "Employee" o "Customer" escribe esta URL, authGuard.js lo redirige a acceso-denegado.html.
 const user = requireRoles(["Admin"]);
 
 if (user) {
@@ -25,6 +34,7 @@ if (user) {
         e.preventDefault();
         clearInlineAlert(alertContainer);
 
+        // Sanitización de entradas con .trim()
         fields.firstName.value = fields.firstName.value.trim();
         fields.lastName.value = fields.lastName.value.trim();
         fields.title.value = fields.title.value.trim();
@@ -37,7 +47,8 @@ if (user) {
         submitBtn.textContent = "Registrando...";
 
         try {
-            // Verificar nombres exactos de propiedades contra el DTO que suba Joseph
+            // PETICIÓN A LA API: POST /api/admin/employees -> AdminEmployeesController.cs -> EmployeeService.cs
+            // apiClient adjunta automáticamente el JWT de Admin en Authorization: Bearer <token>
             await apiClient.post("/admin/employees", {
                 firstName: fields.firstName.value,
                 lastName: fields.lastName.value,
@@ -51,16 +62,9 @@ if (user) {
             form.reset();
             form.classList.remove("was-validated");
         } catch (error) {
-            if (error.status === 404) {
-                showInlineAlert(
-                    alertContainer,
-                    "El endpoint /api/admin/employees aún no está disponible en el backend.",
-                    "info"
-                );
-            } else {
-                const variant = error.status === 409 ? "warning" : "danger";
-                showInlineAlert(alertContainer, error.message, variant, error.errors);
-            }
+            // Si el correo ya existe, el Backend devuelve 409 Conflict
+            const variant = error.status === 409 ? "warning" : "danger";
+            showInlineAlert(alertContainer, error.message, variant, error.errors);
         } finally {
             submitBtn.disabled = false;
             submitBtn.textContent = "Registrar empleado";

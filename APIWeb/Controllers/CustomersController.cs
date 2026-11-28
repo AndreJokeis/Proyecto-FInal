@@ -1,4 +1,12 @@
-﻿using APIWeb.DTOs.Customers;
+﻿// ============================================================================
+// ARCHIVO: Controllers/CustomersController.cs
+// PROPÓSITO: Endpoints CRUD de Clientes con Baja Lógica (/api/customers).
+//            AUTORIZACIÓN EN LA API:
+//            [Authorize(Roles = "Admin,Employee")] permite el acceso únicamente
+//            al personal (Admin y Employee); bloquea a usuarios con rol Customer (403).
+// ============================================================================
+
+using APIWeb.DTOs.Customers;
 using APIWeb.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,6 +25,7 @@ public class CustomersController : ControllerBase
         _customerService = customerService;
     }
 
+    // GET /api/customers -> Lista todos los clientes activos (usado en clientes.js y en el selector de pos.js)
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -24,6 +33,7 @@ public class CustomersController : ControllerBase
         return Ok(result.Data);
     }
 
+    // GET /api/customers/{customerId} -> Consulta un cliente específico por su ID
     [HttpGet("{customerId}")]
     public async Task<IActionResult> GetById(string customerId)
     {
@@ -34,6 +44,7 @@ public class CustomersController : ControllerBase
         return Ok(result.Data);
     }
 
+    // POST /api/customers -> Registra un nuevo cliente en la tabla 'customers'
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateCustomerRequestDto request)
     {
@@ -44,6 +55,7 @@ public class CustomersController : ControllerBase
         return StatusCode(result.StatusCode, result.Data);
     }
 
+    // PUT /api/customers/{customerId} -> Actualiza los datos y dirección de un cliente existente
     [HttpPut("{customerId}")]
     public async Task<IActionResult> Update(string customerId, [FromBody] UpdateCustomerRequestDto request)
     {
@@ -54,6 +66,7 @@ public class CustomersController : ControllerBase
         return Ok(result.Data);
     }
 
+    // DELETE /api/customers/{customerId} -> Ejecuta la BAJA LÓGICA (IsDeleted = true) sin borrar de MySQL
     [HttpDelete("{customerId}")]
     public async Task<IActionResult> Delete(string customerId)
     {

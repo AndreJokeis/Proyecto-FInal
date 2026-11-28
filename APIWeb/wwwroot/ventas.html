@@ -1,9 +1,19 @@
 <!DOCTYPE html>
+<!-- ==========================================================================
+     ARCHIVO: wwwroot/ventas.html
+     PROPÓSITO: Vista de Historial de Ventas (para Admin/Employee) o Mis Pedidos
+                (para Customer). Controlada por js/pages/ventas.js.
+     AQUÍ SE MUESTRA:
+     - Tabla principal con ID Orden, Cliente, Vendedor (empleado que vendió en
+       la tabla 'employees'), Fecha, Destino (tomado del cliente en 'customers'),
+       Total y botón "Ver detalle".
+     - Modal #orderDetailModal con el desglose de productos vendidos en la orden.
+     ========================================================================== -->
 <html lang="es">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Historial de Ventas - Northwind POS</title>
+    <title>Historial de Ventas - Fashion Roma</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="bg-light">
@@ -14,7 +24,6 @@
             <div>
                 <h1 class="h3 fw-bold mb-1" id="page-title">Historial de Ventas</h1>
             </div>
-            <a href="pos.html" class="btn btn-primary">+ Nueva venta</a>
         </div>
 
         <div id="page-alert"></div>
@@ -26,10 +35,10 @@
                         <input type="search"
                                id="search-input"
                                class="form-control form-control-sm"
-                               placeholder="Buscar por ID, cliente, ciudad o país...">
+                               placeholder="Buscar por ID, cliente, vendedor o destino...">
                     </div>
                     <div class="col-12 col-md-6 col-lg-8 text-md-end">
-                        <span class="badge text-bg-secondary" id="orders-count">0 órdenes</span>
+                        <span class="badge text-bg-success" id="orders-count">0 órdenes</span>
                     </div>
                 </div>
             </div>
@@ -40,6 +49,7 @@
                         <tr>
                             <th>ID Orden</th>
                             <th>Cliente</th>
+                            <th>Vendedor</th>
                             <th>Fecha</th>
                             <th>Destino</th>
                             <th class="text-end">Total</th>
@@ -55,21 +65,25 @@
     <div class="modal fade" id="orderDetailModal" tabindex="-1" aria-labelledby="orderDetailModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header bg-success text-white">
                     <h2 class="modal-title fs-5" id="orderDetailModalLabel">Detalle de Orden</h2>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
                     <div id="modal-alert"></div>
 
                     <div class="row g-2 mb-3 small text-muted">
-                        <div class="col-md-6">
+                        <div class="col-sm-6 col-md-3">
                             <div><strong>Cliente:</strong> <span id="detail-customer">-</span></div>
+                        </div>
+                        <div class="col-sm-6 col-md-3">
+                            <div><strong>Vendedor:</strong> <span id="detail-employee">-</span></div>
+                        </div>
+                        <div class="col-sm-6 col-md-3">
                             <div><strong>Fecha:</strong> <span id="detail-date">-</span></div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-sm-6 col-md-3">
                             <div><strong>Destino:</strong> <span id="detail-destination">-</span></div>
-                            <div><strong>Empleado ID:</strong> <span id="detail-employee">-</span></div>
                         </div>
                     </div>
 
@@ -87,7 +101,7 @@
                         </table>
                     </div>
 
-                    <div class="text-end fw-bold fs-5 mt-3">
+                    <div class="text-end fw-bold fs-5 text-success mt-3">
                         Total: $<span id="detail-total">0.00</span>
                     </div>
                 </div>
@@ -99,6 +113,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script type="module" src="js/pages/ventas.js"></script>
+    <script type="module" src="js/pages/ventas.js?v=3"></script>
 </body>
 </html>

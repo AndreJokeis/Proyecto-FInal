@@ -1,4 +1,16 @@
-﻿namespace APIWeb.Services;
+﻿// ============================================================================
+// ARCHIVO: Services/ServiceResult.cs
+// PROPÓSITO: Clase envoltorio genérica para comunicar resultados desde la capa
+//            de Servicios hacia los Controladores sin lanzar excepciones para
+//            errores de negocio esperados.
+//            CÓMO FUNCIONA:
+//            - ServiceResult<T>.Ok(data, statusCode, message) -> operación exitosa (200 / 201).
+//            - ServiceResult<T>.Fail(statusCode, message) -> regla de negocio rechazada
+//              (400 Bad Request, 401 Unauthorized, 403 Forbidden, 404 Not Found,
+//               409 Conflict por duplicado, 423 Locked por 3 intentos fallidos).
+// ============================================================================
+
+namespace APIWeb.Services;
 
 public class ServiceResult<T>
 {

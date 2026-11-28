@@ -1,4 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿// ============================================================================
+// ARCHIVO: DTOs/Auth/LoginRequestDto.cs
+// PROPÓSITO: DTO de entrada para POST /api/auth/login (recibido desde login.js).
+//            Exige únicamente Email con formato válido y Password obligatoria.
+// ============================================================================
+
+using System.ComponentModel.DataAnnotations;
 
 namespace APIWeb.DTOs.Auth
 {

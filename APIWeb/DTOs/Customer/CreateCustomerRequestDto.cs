@@ -1,4 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿// ============================================================================
+// ARCHIVO: DTOs/Customer/CreateCustomerRequestDto.cs
+// PROPÓSITO: DTO de entrada para dar de alta un cliente (POST /api/customers).
+//            Valida longitudes máximas exactas de las columnas de la tabla
+//            'customers' en MySQL Northwind y formato alfanumérico de CustomerId.
+// ============================================================================
+
+using System.ComponentModel.DataAnnotations;
 
 namespace APIWeb.DTOs.Customers;
 

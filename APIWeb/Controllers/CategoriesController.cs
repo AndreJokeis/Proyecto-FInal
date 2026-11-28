@@ -1,3 +1,9 @@
+// ============================================================================
+// ARCHIVO: Controllers/CategoriesController.cs
+// PROPÓSITO: Endpoint de solo lectura (GET /api/Categories) para poblar el
+//            filtro y el selector de categorías en productos.html.
+// ============================================================================
+
 using APIWeb.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

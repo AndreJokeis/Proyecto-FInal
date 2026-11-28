@@ -1,5 +1,12 @@
-﻿import { requireRoles } from "../guards/authGuard.js";
-import { renderNavbar } from "../components/navbar.js";
+﻿// ============================================================================
+// ARCHIVO: clientes.js
+// PROPÓSITO: CRUD completo de Clientes con Baja Lógica (Soft Delete) conectado
+//            a CustomersController (/api/customers), protegido para Admin/Employee
+//            y renderizado con textContent para evitar ataques XSS.
+// ============================================================================
+
+import { requireRoles } from "../guards/authGuard.js";
+import { renderNavbar } from "../components/navbar.js?v=2";
 import { apiClient } from "../services/apiClient.js";
 import {
     clearInlineAlert,
@@ -8,11 +15,11 @@ import {
     showToast
 } from "../utils/ui.js";
 
+// REVISIÓN DE ACCESO POR URL: Solo Admin y Employee pueden acceder a clientes.html
 const user = requireRoles(["Admin", "Employee"]);
 
 if (user) {
     renderNavbar();
-
     const tbody = document.getElementById("customers-tbody");
     const countBadge = document.getElementById("customers-count");
     const searchInput = document.getElementById("search-input");
@@ -43,6 +50,7 @@ if (user) {
     let allCustomers = [];
     let editingCustomerId = null;
 
+    // Sanitización de campos opcionales: recorta espacios y convierte cadenas vacías en null
     function toNullIfEmpty(value) {
         const trimmed = (value || "").trim();
         return trimmed.length > 0 ? trimmed : null;
@@ -59,6 +67,11 @@ if (user) {
         tbody.appendChild(tr);
     }
 
+    /**
+     * Renderiza la tabla de clientes activos.
+     * PREVENCIÓN DE XSS: Cada celda se crea con document.createElement y se llena con .textContent
+     * para que cualquier etiqueta <script> o HTML malicioso se muestre como simple texto.
+     */
     function renderTable(list) {
         countBadge.textContent = `${list.length} cliente${list.length === 1 ? "" : "s"}`;
 
@@ -121,6 +134,7 @@ if (user) {
         });
     }
 
+    // Buscador en tiempo real por ID, empresa, contacto, ciudad, país o teléfono
     function applyFilter() {
         const q = searchInput.value.trim().toLowerCase();
         if (!q) {
@@ -146,6 +160,10 @@ if (user) {
         renderTable(filtered);
     }
 
+    /**
+     * PETICIÓN GET /api/customers -> CustomersController.GetAll -> CustomerService.ObtenerTodosAsync
+     * El Backend devuelve únicamente los clientes con IsDeleted == false (CustomerResponseDto).
+     */
     async function loadCustomers() {
         clearInlineAlert(pageAlert);
         renderEmptyRow("Cargando clientes...");
@@ -180,7 +198,7 @@ if (user) {
         modalTitle.textContent = `Editar cliente (${customer.customerId})`;
 
         fields.customerId.value = customer.customerId || "";
-        fields.customerId.disabled = true;
+        fields.customerId.disabled = true; // El ID del cliente no se puede modificar al editar
         fields.companyName.value = customer.companyName || "";
         fields.contactName.value = customer.contactName || "";
         fields.contactTitle.value = customer.contactTitle || "";
@@ -194,6 +212,11 @@ if (user) {
         customerModal.show();
     }
 
+    /**
+     * BAJA LÓGICA DE CLIENTES (REGLA DE NEGOCIO: EVITAR ELIMINACIÓN FÍSICA):
+     * Llama a DELETE /api/customers/{id}. En el Backend (CustomerService.SoftDeleteAsync)
+     * NO se hace DELETE en MySQL, sino customer.IsDeleted = true para no romper sus órdenes históricas.
+     */
     async function handleSoftDelete(customer) {
         const confirmed = await showConfirmModal({
             title: "Confirmar baja lógica",
@@ -213,6 +236,7 @@ if (user) {
         }
     }
 
+    // Envío del formulario de Crear (POST /api/customers) o Editar (PUT /api/customers/{id})
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
         clearInlineAlert(modalAlert);
@@ -223,6 +247,7 @@ if (user) {
         form.classList.add("was-validated");
         if (!form.checkValidity()) return;
 
+        // MÍNIMA EXPOSICIÓN: Solo viajan las propiedades exactas definidas en Create/UpdateCustomerRequestDto
         const basePayload = {
             companyName: fields.companyName.value,
             contactName: toNullIfEmpty(fields.contactName.value),
@@ -256,6 +281,7 @@ if (user) {
             customerModal.hide();
             await loadCustomers();
         } catch (error) {
+            // PREVENCIÓN DE DUPLICADOS: Si el CustomerId ya existe, el Backend devuelve 409 Conflict
             const variant = error.status === 409 ? "warning" : "danger";
             showInlineAlert(modalAlert, error.message, variant, error.errors);
         } finally {

@@ -1,3 +1,9 @@
+// ============================================================================
+// ARCHIVO: Services/Interfaces/IProductService.cs
+// PROPÓSITO: Contrato del servicio de catálogo de productos, categorías,
+//            proveedores y descontinuación lógica.
+// ============================================================================
+
 using APIWeb.DTOs.Products;
 
 namespace APIWeb.Services.Interfaces;

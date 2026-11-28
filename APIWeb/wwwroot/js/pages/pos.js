@@ -1,8 +1,28 @@
-import { renderNavbar } from "../components/navbar.js";
+// ============================================================================
+// ARCHIVO: wwwroot/js/pages/pos.js
+// PROPÓSITO: Punto de Venta y Carrito de Compras.
+//            AQUÍ SE HACE:
+//            1. Revisión de acceso por URL (requireRoles(["Customer", "Employee", "Admin"])).
+//            2. Si el usuario es Employee o Admin (isStaff), muestra el selector de
+//               clientes (GET /api/Customers). Si es Customer, oculta ese selector
+//               porque el Backend toma su CustomerId directamente del JWT.
+//            3. Carga el catálogo activo (GET /api/Products) y deshabilita el botón
+//               "+ Agregar" en productos descontinuados o con stock <= 0.
+//            4. Controla el carrito en memoria validando que la cantidad nunca
+//               supere el stock disponible (maxStock).
+//            5. Al confirmar la venta (POST /api/Orders):
+//               - Envía ÚNICAMENTE { customerId, items: [{ productId, quantity }] }.
+//               - NO envía precios ni dirección de destino: el Backend toma el
+//                 UnitPrice desde la tabla 'products', el vendedor desde el
+//                 EmployeeId del JWT y el destino desde la tabla 'customers' en MySQL.
+// ============================================================================
+
+import { renderNavbar } from "../components/navbar.js?v=2";
 import { requireRoles } from "../guards/authGuard.js";
 import { apiClient } from "../services/apiClient.js";
 import { clearInlineAlert, showConfirmModal, showInlineAlert, showToast } from "../utils/ui.js";
 
+// REVISIÓN DE ACCESO POR URL
 const user = requireRoles(["Customer", "Employee", "Admin"]);
 if (!user) {
     throw new Error("Acceso no autorizado.");
@@ -24,6 +44,7 @@ const cartTotal = document.getElementById("cart-total");
 const btnClearCart = document.getElementById("btn-clear-cart");
 const btnConfirmSale = document.getElementById("btn-confirm-sale");
 
+// Si es empleado o administrador, habilita el selector para elegir a qué cliente se le vende
 if (isStaff) {
     customerSection.classList.remove("d-none");
 } else {
@@ -38,6 +59,9 @@ function formatMoney(value) {
     return Number(value || 0).toFixed(2);
 }
 
+/**
+ * Carga la lista de clientes activos desde GET /api/Customers (solo para Employee/Admin).
+ */
 async function loadCustomers() {
     try {
         const data = await apiClient.get("/Customers");
@@ -64,6 +88,9 @@ function renderProductsMessage(message) {
     productsTbody.appendChild(tr);
 }
 
+/**
+ * Carga los productos disponibles desde GET /api/Products.
+ */
 async function loadProducts() {
     clearInlineAlert(pageAlert);
     renderProductsMessage("Cargando productos...");
@@ -78,6 +105,11 @@ async function loadProducts() {
     }
 }
 
+/**
+ * Renderiza la tabla de productos del POS.
+ * REGLA DE NEGOCIO EN UI: Si el producto está descontinuado o sin stock, el botón
+ * "+ Agregar" queda deshabilitado (btnAdd.disabled = !available).
+ */
 function renderProducts(list) {
     productsTbody.replaceChildren();
 
@@ -149,6 +181,10 @@ function renderProducts(list) {
     });
 }
 
+/**
+ * Agrega un producto al carrito o incrementa su cantidad si ya estaba agregado,
+ * evitando duplicar renglones del mismo producto y validando que no exceda el stock.
+ */
 function addToCart(product) {
     const stock = Number(product.unitsInStock || 0);
     if (Boolean(product.discontinued) || stock <= 0) {
@@ -176,6 +212,9 @@ function addToCart(product) {
     renderCart();
 }
 
+// Ajusta la cantidad (+1 o -1) de un producto dentro del carrito:
+// - Si baja a 0 o menos, elimina el renglón del carrito.
+// - Si intenta superar el stock disponible (item.maxStock), muestra advertencia y lo bloquea.
 function updateQuantity(productId, delta) {
     const item = cart.find((i) => i.productId === productId);
     if (!item) return;
@@ -194,11 +233,14 @@ function updateQuantity(productId, delta) {
     renderCart();
 }
 
+// Quita por completo un producto del arreglo 'cart' y vuelve a dibujar la tabla del carrito
 function removeFromCart(productId) {
     cart = cart.filter((i) => i.productId !== productId);
     renderCart();
 }
 
+// Dibuja el estado actual del carrito en pos.html y calcula el total estimado en pantalla
+// (recordando que el total y precios definitivos siempre los recalcula OrderService en el servidor).
 function renderCart() {
     cartTbody.replaceChildren();
 
@@ -284,6 +326,11 @@ btnClearCart.addEventListener("click", async () => {
     renderCart();
 });
 
+/**
+ * AQUÍ SE CONFIRMA LA VENTA (POST /api/Orders -> OrdersController.Create -> OrderService.CrearOrdenAsync):
+ * - Observa que en 'payload' SOLO viajan productId y quantity (y customerId si vende un empleado/admin).
+ * - El precio real se toma de 'products' en MySQL, el vendedor del JWT y el destino de 'customers' en MySQL.
+ */
 btnConfirmSale.addEventListener("click", async () => {
     clearInlineAlert(pageAlert);
 
@@ -315,18 +362,13 @@ btnConfirmSale.addEventListener("click", async () => {
         const orderIdText = data?.orderId ? ` (#${data.orderId})` : "";
         showToast(`Venta registrada exitosamente${orderIdText}.`, "success");
         cart = [];
+        if (isStaff) {
+            customerSelect.value = "";
+        }
         renderCart();
         await loadProducts();
     } catch (error) {
-        if (error.status === 404 || error.status === 405) {
-            showInlineAlert(
-                pageAlert,
-                "El endpoint POST /api/Orders aún no está disponible en el backend.",
-                "info"
-            );
-        } else {
-            showInlineAlert(pageAlert, error.message || "No se pudo registrar la venta.", "danger", error.errors);
-        }
+        showInlineAlert(pageAlert, error.message || "No se pudo registrar la venta.", "danger", error.errors);
         btnConfirmSale.disabled = false;
     }
 });

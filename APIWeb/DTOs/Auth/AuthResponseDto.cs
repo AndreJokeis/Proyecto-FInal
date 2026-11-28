@@ -1,4 +1,13 @@
-﻿namespace APIWeb.DTOs.Auth
+﻿// ============================================================================
+// ARCHIVO: DTOs/Auth/AuthResponseDto.cs
+// PROPÓSITO: DTO de salida que devuelve la API al iniciar sesión o registrarse.
+//            POR QUÉ SE USA (Mínima exposición):
+//            Solo viaja al Frontend el token JWT (AccessToken), su expiración y
+//            datos básicos del usuario (UserId, Nombre, Rol). NUNCA viajan el
+//            PasswordHash, contador de intentos fallidos ni banderas internas.
+// ============================================================================
+
+namespace APIWeb.DTOs.Auth
 {
     public class AuthResponseDto
     {

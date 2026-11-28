@@ -1,3 +1,10 @@
+// ============================================================================
+// ARCHIVO: DTOs/Products/CreateProductRequestDto.cs
+// PROPÓSITO: DTO de entrada para crear un producto (POST /api/Products).
+//            Solo incluye los campos necesarios del negocio y valida que
+//            UnitPrice y UnitsInStock no sean negativos.
+// ============================================================================
+
 using System.ComponentModel.DataAnnotations;
 
 namespace APIWeb.DTOs.Products;

@@ -1,4 +1,14 @@
-﻿namespace APIWeb.Models;
+﻿// ============================================================================
+// ARCHIVO: Models/Product.cs
+// PROPÓSITO: Entidad de la tabla 'products' de Northwind en MySQL.
+//            REGLAS DE NEGOCIO ASOCIADAS:
+//            - UnitPrice: Precio oficial del producto en la BD (fuente única de verdad).
+//            - UnitsInStock: Existencias actuales; se valida y descuenta al vender.
+//            - Discontinued: Baja lógica de productos. Si es true, no se elimina de la BD
+//              (para no romper 'order details' históricos), pero se bloquea su venta.
+// ============================================================================
+
+namespace APIWeb.Models;
 
 public partial class Product
 {

@@ -1,3 +1,10 @@
+// ============================================================================
+// ARCHIVO: DTOs/Products/UpdateProductRequestDto.cs
+// PROPÓSITO: DTO de entrada para actualizar un producto (PUT /api/Products/{id}).
+//            Contiene exactamente las mismas propiedades editables y validaciones
+//            que CreateProductRequestDto.
+// ============================================================================
+
 using System.ComponentModel.DataAnnotations;
 
 namespace APIWeb.DTOs.Products;

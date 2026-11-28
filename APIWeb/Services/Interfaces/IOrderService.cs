@@ -1,4 +1,10 @@
-﻿using APIWeb.DTOs.Orders;
+﻿// ============================================================================
+// ARCHIVO: Services/Interfaces/IOrderService.cs
+// PROPÓSITO: Contrato del servicio de órdenes (consulta de historial filtrado
+//            por rol, detalle de orden y registro transaccional de ventas POS).
+// ============================================================================
+
+using APIWeb.DTOs.Orders;
 
 namespace APIWeb.Services.Interfaces;
 

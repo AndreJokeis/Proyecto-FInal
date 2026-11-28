@@ -1,4 +1,10 @@
-﻿namespace APIWeb.DTOs.Orders;
+﻿// ============================================================================
+// ARCHIVO: DTOs/Orders/OrderItemResponseDto.cs
+// PROPÓSITO: DTO de salida con el detalle de cada producto dentro de una orden
+//            (nombre, precio oficial aplicado, cantidad y subtotal calculado).
+// ============================================================================
+
+namespace APIWeb.DTOs.Orders;
 
 public class OrderItemResponseDto
 {

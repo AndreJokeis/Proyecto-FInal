@@ -1,4 +1,15 @@
-﻿namespace APIWeb.Models;
+﻿// ============================================================================
+// ARCHIVO: Models/Employee.cs
+// PROPÓSITO: Entidad de la tabla 'employees' de Northwind en MySQL.
+//            CUÁNDO SE USA:
+//            1. Cuando el Administrador da de alta un empleado o admin en empleados.html
+//               (EmployeeService inserta aquí primero para obtener EmployeeId y luego
+//               crea su usuario en la tabla 'usuarios' con ese EmployeeId).
+//            2. En el historial y detalle de ventas (OrderService hace Include(o => o.Employee)
+//               para tomar FirstName + LastName y mostrar quién realizó la venta).
+// ============================================================================
+
+namespace APIWeb.Models;
 
 public partial class Employee
 {

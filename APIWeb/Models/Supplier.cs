@@ -1,4 +1,11 @@
-﻿namespace APIWeb.Models;
+﻿// ============================================================================
+// ARCHIVO: Models/Supplier.cs
+// PROPÓSITO: Entidad de la tabla 'suppliers' (proveedores) de Northwind en MySQL.
+//            Se expone hacia el formulario de productos únicamente con su ID y nombre
+//            de empresa mediante SupplierResponseDto (mínima exposición de datos).
+// ============================================================================
+
+namespace APIWeb.Models;
 
 public partial class Supplier
 {

@@ -1,4 +1,15 @@
-﻿using System.Security.Claims;
+﻿// ============================================================================
+// ARCHIVO: Controllers/OrderController.cs (OrdersController)
+// PROPÓSITO: Endpoints de Ventas y Pedidos (/api/Orders).
+//            CÓMO TOMA LOS DATOS DEL USUARIO AUTENTICADO:
+//            Lee directamente los Claims firmados dentro del Token JWT:
+//            - ClaimTypes.Role: Rol del usuario ("Admin", "Employee" o "Customer").
+//            - "CustomerId": ID del cliente (si el usuario es Customer).
+//            - "EmployeeId": ID del empleado en la tabla 'employees' (si es Employee o Admin)
+//              para registrar automáticamente quién realizó la venta.
+// ============================================================================
+
+using System.Security.Claims;
 using APIWeb.DTOs.Orders;
 using APIWeb.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -18,6 +29,7 @@ public class OrdersController : ControllerBase
         _orderService = orderService;
     }
 
+    // GET /api/Orders -> Historial de ventas (todas para Admin/Employee; solo las propias para Customer)
     [HttpGet]
     public async Task<IActionResult> GetOrders()
     {
@@ -31,6 +43,7 @@ public class OrdersController : ControllerBase
         return Ok(result.Data);
     }
 
+    // GET /api/Orders/{orderId} -> Detalle de una orden específica (usado por el modal de ventas.js)
     [HttpGet("{orderId:int}")]
     public async Task<IActionResult> GetById(int orderId)
     {
@@ -44,6 +57,7 @@ public class OrdersController : ControllerBase
         return Ok(result.Data);
     }
 
+    // POST /api/Orders -> Registra una nueva venta desde el Punto de Venta (pos.js)
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateOrderRequestDto request)
     {

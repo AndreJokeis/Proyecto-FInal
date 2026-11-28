@@ -1,3 +1,10 @@
+// ============================================================================
+// ARCHIVO: Controllers/SuppliersController.cs
+// PROPÓSITO: Endpoint de solo lectura (GET /api/Suppliers) protegido para
+//            Admin y Employee, usado para poblar el selector de proveedores
+//            al crear o editar productos en productos.html.
+// ============================================================================
+
 using APIWeb.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

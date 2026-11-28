@@ -1,4 +1,15 @@
-﻿using APIWeb.Models;
+﻿// ============================================================================
+// ARCHIVO: Data/ContextoBD.cs
+// PROPÓSITO: Contexto de Entity Framework Core que mapea las tablas de la base
+//            de datos MySQL "nwind_pos" (Northwind extendida para el Punto de Venta).
+//            AQUÍ SE DEFINEN:
+//            - Los DbSet<T> (tablas disponibles para consultas LINQ).
+//            - Las llaves primarias, índices únicos, longitudes máximas y relaciones
+//              (Foreign Keys) entre usuarios, customers, employees, orders,
+//              order details, products, categories, suppliers y shippers.
+// ============================================================================
+
+using APIWeb.Models;
 using APIWeb.Models.Enums;
 using Microsoft.EntityFrameworkCore;
 
@@ -295,10 +306,5 @@ public partial class ContextoBD : DbContext
             entity.Property(e => e.PostalCode).HasMaxLength(10);
             entity.Property(e => e.Region).HasMaxLength(15);
         });
-
-        OnModelCreatingPartial(modelBuilder);
     }
-
-
-    partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }

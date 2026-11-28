@@ -1,3 +1,16 @@
+
+// ============================================================================
+// ARCHIVO: wwwroot/js/utils/ui.js
+// PROPÓSITO: Utilidades visuales reutilizables (Toasts, Alertas en línea y Modales
+//            de confirmación) basadas en Bootstrap 5 para cumplir con el requisito
+//            de "Mensajes adecuados" y "Sanitización / Prevención de XSS".
+//            SEGURIDAD ANTI-XSS:
+//            Todos los textos dinámicos (mensajes de la API, nombres de clientes o
+//            productos y listas de errores) se insertan exclusivamente mediante
+//            .textContent sobre nodos creados con document.createElement().
+// ============================================================================
+
+// Garantiza que exista el contenedor flotante en la esquina superior derecha para los Toasts
 function ensureToastContainer() {
     let container = document.getElementById("app-toast-container");
     if (!container) {
@@ -10,6 +23,10 @@ function ensureToastContainer() {
     return container;
 }
 
+/**
+ * Muestra una notificación flotante (Toast) en la esquina superior derecha.
+ * PREVENCIÓN XSS: Se asigna el mensaje con body.textContent (nunca innerHTML).
+ */
 export function showToast(message, type = "info") {
     const typeMap = {
         success: "text-bg-success",
@@ -31,7 +48,7 @@ export function showToast(message, type = "info") {
 
     const body = document.createElement("div");
     body.className = "toast-body";
-    body.textContent = message;
+    body.textContent = message; // Escapado seguro anti-XSS
 
     const closeBtn = document.createElement("button");
     closeBtn.type = "button";
@@ -48,6 +65,10 @@ export function showToast(message, type = "info") {
     toast.show();
 }
 
+/**
+ * Muestra una alerta de Bootstrap dentro de un contenedor de la página o formulario
+ * (por ejemplo, errores de credenciales, cuenta bloqueada 423 o registro duplicado 409).
+ */
 export function showInlineAlert(container, message, type = "danger", details = []) {
     if (!container) return;
     container.replaceChildren();
@@ -57,7 +78,7 @@ export function showInlineAlert(container, message, type = "danger", details = [
     alertDiv.setAttribute("role", "alert");
 
     const mainText = document.createElement("div");
-    mainText.textContent = message;
+    mainText.textContent = message; // Escapado seguro anti-XSS
     alertDiv.appendChild(mainText);
 
     if (Array.isArray(details) && details.length > 0) {
@@ -65,7 +86,7 @@ export function showInlineAlert(container, message, type = "danger", details = [
         list.className = "mb-0 mt-2 ps-3";
         details.forEach((item) => {
             const li = document.createElement("li");
-            li.textContent = item;
+            li.textContent = item; // Escapado seguro anti-XSS
             list.appendChild(li);
         });
         alertDiv.appendChild(list);
@@ -85,6 +106,10 @@ export function clearInlineAlert(container) {
     if (container) container.replaceChildren();
 }
 
+/**
+ * Muestra un modal de confirmación de Bootstrap (usado antes de dar de baja lógica
+ * un cliente o vaciar el carrito) y devuelve una Promesa booleana (true / false).
+ */
 export function showConfirmModal({
     title = "Confirmar acción",
     message = "¿Deseas continuar?",

@@ -1,4 +1,12 @@
-﻿namespace APIWeb.DTOs.Customers;
+﻿// ============================================================================
+// ARCHIVO: DTOs/Customer/CustomerResponseDto.cs
+// PROPÓSITO: DTO de salida para clientes activos (GET /api/customers).
+//            POR QUÉ SE USA (Mínima exposición):
+//            Omite columnas binarias pesadas (Image, ImageThumbnail), Fax,
+//            la bandera interna IsDeleted y la colección completa de Orders.
+// ============================================================================
+
+namespace APIWeb.DTOs.Customers;
 
 public class CustomerResponseDto
 {

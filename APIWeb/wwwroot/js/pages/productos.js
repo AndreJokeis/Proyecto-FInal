@@ -1,5 +1,23 @@
+// ============================================================================
+// ARCHIVO: wwwroot/js/pages/productos.js
+// PROPÓSITO: Catálogo de Productos con filtros y CRUD para Admin/Employee.
+//            AQUÍ SE HACE:
+//            1. Revisión de acceso por URL (requireRoles(["Customer", "Employee", "Admin"])).
+//            2. Si el usuario es Customer, solo ve el catálogo disponible (sin botones
+//               de crear, editar ni descontinuar).
+//            3. Si es Admin o Employee (isStaff), muestra el botón "+ Nuevo producto",
+//               la columna de "Acciones" y consulta también los productos descontinuados.
+//            4. Carga Categorías (GET /api/Categories) y Proveedores (GET /api/Suppliers)
+//               para los selectores y filtros.
+//            5. Baja lógica de productos: al pulsar "Descontinuar", llama a
+//               DELETE /api/Products/{id} (que en ProductService marca Discontinued = true
+//               sin borrar el producto de MySQL). Al pulsar "Reactivar", llama a
+//               PUT /api/Products/{id} con discontinued = false.
+//            6. Renderiza todo con document.createElement y .textContent (anti-XSS).
+// ============================================================================
+
 import { requireRoles } from "../guards/authGuard.js";
-import { renderNavbar } from "../components/navbar.js";
+import { renderNavbar } from "../components/navbar.js?v=2";
 import { apiClient } from "../services/apiClient.js";
 import {
     clearInlineAlert,
@@ -8,6 +26,7 @@ import {
     showToast
 } from "../utils/ui.js";
 
+// REVISIÓN DE ACCESO POR URL
 const user = requireRoles(["Customer", "Employee", "Admin"]);
 
 if (user) {
@@ -34,6 +53,7 @@ if (user) {
     const form = document.getElementById("product-form");
     const btnSave = document.getElementById("btn-save-product");
 
+    // Campos del formulario que coinciden exactamente con Create/UpdateProductRequestDto
     const fields = {
         productName: document.getElementById("productName"),
         quantityPerUnit: document.getElementById("quantityPerUnit"),
@@ -41,11 +61,10 @@ if (user) {
         supplierId: document.getElementById("supplierId"),
         unitPrice: document.getElementById("unitPrice"),
         unitsInStock: document.getElementById("unitsInStock"),
-        unitsOnOrder: document.getElementById("unitsOnOrder"),
-        reorderLevel: document.getElementById("reorderLevel"),
         discontinued: document.getElementById("discontinued")
     };
 
+    // Solo Admin y Employee pueden ver controles de creación y edición
     if (isStaff) {
         btnNew.classList.remove("d-none");
         thActions.classList.remove("d-none");
@@ -77,6 +96,10 @@ if (user) {
         tbody.appendChild(tr);
     }
 
+    /**
+     * Renderiza la tabla del catálogo de productos.
+     * PREVENCIÓN XSS: Todos los textos provenientes de la API se insertan con .textContent.
+     */
     function renderTable(list) {
         countBadge.textContent = `${list.length} producto${list.length === 1 ? "" : "s"}`;
 
@@ -177,6 +200,7 @@ if (user) {
         });
     }
 
+    // Filtra en memoria por texto, categoría seleccionada y estado (disponible / sin stock / descontinuado)
     function applyFilters() {
         const q = searchInput.value.trim().toLowerCase();
         const selectedCategory = categoryFilter.value;
@@ -219,6 +243,10 @@ if (user) {
         renderTable(filtered);
     }
 
+    /**
+     * Consulta Categorías (GET /api/Categories) y Proveedores (GET /api/Suppliers)
+     * para llenar los selectores del filtro y del modal.
+     */
     async function loadLookups() {
         const [categoriesResult, suppliersResult] = await Promise.allSettled([
             apiClient.get("/Categories", { skipAuthRedirect: true }),
@@ -259,12 +287,16 @@ if (user) {
         }
     }
 
+    /**
+     * Consulta los productos desde GET /api/Products.
+     * Si es staff (Admin/Employee), envía ?includeDiscontinued=true para poder administrarlos.
+     */
     async function loadProducts() {
         clearInlineAlert(pageAlert);
         renderEmptyRow("Cargando productos...");
 
         try {
-            const data = await apiClient.get("/Products");
+            const data = await apiClient.get(isStaff ? "/Products?includeDiscontinued=true" : "/Products");
             allProducts = Array.isArray(data) ? data : [];
             applyFilters();
         } catch (error) {
@@ -284,8 +316,6 @@ if (user) {
         resetForm();
         modalTitle.textContent = "Nuevo producto";
         fields.unitsInStock.value = "0";
-        fields.unitsOnOrder.value = "0";
-        fields.reorderLevel.value = "0";
         fields.discontinued.checked = false;
         productModal.show();
     }
@@ -301,13 +331,16 @@ if (user) {
         fields.supplierId.value = product.supplierId != null ? String(product.supplierId) : "";
         fields.unitPrice.value = product.unitPrice != null ? String(product.unitPrice) : "";
         fields.unitsInStock.value = product.unitsInStock != null ? String(product.unitsInStock) : "0";
-        fields.unitsOnOrder.value = product.unitsOnOrder != null ? String(product.unitsOnOrder) : "0";
-        fields.reorderLevel.value = product.reorderLevel != null ? String(product.reorderLevel) : "0";
         fields.discontinued.checked = Boolean(product.discontinued);
 
         productModal.show();
     }
 
+    /**
+     * AQUÍ SE HACE LA BAJA LÓGICA / REACTIVACIÓN DE UN PRODUCTO:
+     * - Si se va a descontinuar: llama a DELETE /api/Products/{id} -> ProductService.DescontinuarAsync.
+     * - Si se va a reactivar: llama a PUT /api/Products/{id} con discontinued: false.
+     */
     async function handleToggleDiscontinued(product) {
         const nextDiscontinued = !Boolean(product.discontinued);
         const actionLabel = nextDiscontinued ? "Descontinuar" : "Reactivar";
@@ -324,32 +357,29 @@ if (user) {
         if (!confirmed) return;
 
         try {
-            const payload = {
-                productId: product.productId,
-                productName: product.productName,
-                supplierId: product.supplierId ?? null,
-                categoryId: product.categoryId ?? null,
-                quantityPerUnit: product.quantityPerUnit ?? null,
-                unitPrice: Number(product.unitPrice || 0),
-                unitsInStock: Number(product.unitsInStock || 0),
-                unitsOnOrder: Number(product.unitsOnOrder || 0),
-                reorderLevel: Number(product.reorderLevel || 0),
-                discontinued: nextDiscontinued
-            };
-
-            await apiClient.put(`/Products/${product.productId}`, payload);
-            showToast(
-                nextDiscontinued
-                    ? "Producto marcado como descontinuado."
-                    : "Producto reactivado correctamente.",
-                "success"
-            );
+            if (nextDiscontinued) {
+                const res = await apiClient.delete(`/Products/${product.productId}`);
+                showToast(res?.message || "Producto marcado como descontinuado.", "success");
+            } else {
+                const payload = {
+                    productName: product.productName,
+                    supplierId: product.supplierId ?? null,
+                    categoryId: product.categoryId ?? null,
+                    quantityPerUnit: product.quantityPerUnit ?? null,
+                    unitPrice: Number(product.unitPrice || 0),
+                    unitsInStock: Number(product.unitsInStock || 0),
+                    discontinued: false
+                };
+                await apiClient.put(`/Products/${product.productId}`, payload);
+                showToast("Producto reactivado correctamente.", "success");
+            }
             await loadProducts();
         } catch (error) {
             showToast(error.message || "No se pudo actualizar el estado del producto.", "danger");
         }
     }
 
+    // Envío del formulario para Crear (POST /api/Products) o Editar (PUT /api/Products/{id})
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
         clearInlineAlert(modalAlert);
@@ -358,6 +388,7 @@ if (user) {
         form.classList.add("was-validated");
         if (!form.checkValidity()) return;
 
+        // Validación preventiva en UI contra nombres de productos duplicados
         const nameLower = fields.productName.value.toLowerCase();
         const duplicate = allProducts.some(
             (p) =>
@@ -369,6 +400,7 @@ if (user) {
             return;
         }
 
+        // MÍNIMA EXPOSICIÓN: Solo viajan las propiedades definidas en Create/UpdateProductRequestDto
         const payload = {
             productName: fields.productName.value,
             quantityPerUnit: toNullIfEmpty(fields.quantityPerUnit.value),
@@ -376,8 +408,6 @@ if (user) {
             supplierId: fields.supplierId.value ? Number(fields.supplierId.value) : null,
             unitPrice: Number(fields.unitPrice.value),
             unitsInStock: Number(fields.unitsInStock.value),
-            unitsOnOrder: fields.unitsOnOrder.value !== "" ? Number(fields.unitsOnOrder.value) : 0,
-            reorderLevel: fields.reorderLevel.value !== "" ? Number(fields.reorderLevel.value) : 0,
             discontinued: fields.discontinued.checked
         };
 
@@ -386,10 +416,7 @@ if (user) {
 
         try {
             if (editingProduct) {
-                await apiClient.put(`/Products/${editingProduct.productId}`, {
-                    productId: editingProduct.productId,
-                    ...payload
-                });
+                await apiClient.put(`/Products/${editingProduct.productId}`, payload);
                 showToast("Producto actualizado correctamente.", "success");
             } else {
                 await apiClient.post("/Products", payload);

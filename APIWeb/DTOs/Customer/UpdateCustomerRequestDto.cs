@@ -1,4 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿// ============================================================================
+// ARCHIVO: DTOs/Customer/UpdateCustomerRequestDto.cs
+// PROPÓSITO: DTO de entrada para editar un cliente existente (PUT /api/customers/{id}).
+//            No incluye CustomerId porque la llave primaria no se modifica;
+//            aquí se actualizan su empresa, contacto y dirección/ciudad/país (destino).
+// ============================================================================
+
+using System.ComponentModel.DataAnnotations;
 
 namespace APIWeb.DTOs.Customers;
 

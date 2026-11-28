@@ -1,4 +1,16 @@
-﻿namespace APIWeb.Models;
+﻿// ============================================================================
+// ARCHIVO: Models/Order.cs
+// PROPÓSITO: Entidad de la tabla 'orders' (encabezado de cada venta/pedido) en MySQL.
+//            RELACIONES CLAVE:
+//            - CustomerId -> Customer (cliente al que pertenece la compra).
+//            - EmployeeId -> Employee (empleado/admin que registró la venta en POS,
+//                            o null si fue una compra directa del cliente en línea).
+//            - ShipName, ShipAddress, ShipCity, ShipRegion, ShipPostalCode, ShipCountry ->
+//              datos de destino tomados directamente del registro del cliente en la BD.
+//            - OrderDetails -> renglones de productos vendidos en esta orden.
+// ============================================================================
+
+namespace APIWeb.Models;
 
 public partial class Order
 {

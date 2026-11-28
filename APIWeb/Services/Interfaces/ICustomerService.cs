@@ -1,4 +1,9 @@
-﻿using APIWeb.DTOs.Customers;
+﻿// ============================================================================
+// ARCHIVO: Services/Interfaces/ICustomerService.cs
+// PROPÓSITO: Contrato del servicio de gestión de clientes con baja lógica.
+// ============================================================================
+
+using APIWeb.DTOs.Customers;
 
 namespace APIWeb.Services.Interfaces;
 
